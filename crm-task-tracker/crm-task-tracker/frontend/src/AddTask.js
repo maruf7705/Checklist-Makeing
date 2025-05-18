@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { Button, TextField } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid'; // For generating unique task IDs
 
 const AddTask = ({ setTasks }) => {
   const [taskName, setTaskName] = useState('');
@@ -8,27 +9,29 @@ const AddTask = ({ setTasks }) => {
     e.preventDefault();
     if (!taskName) return;
 
-    // Post new task to backend
-    axios.post('http://localhost:5000/tasks', { name: taskName })
-      .then(response => {
-        // Update tasks list in parent component
-        setTasks(prevTasks => [...prevTasks, response.data]);
-        setTaskName(''); // Clear input field after submitting
-      })
-      .catch(error => console.error('Error adding task:', error));
+    const newTask = {
+      _id: uuidv4(), // Unique ID for each task
+      name: taskName,
+      completed: false,
+    };
+
+    setTasks(prevTasks => [...prevTasks, newTask]);
+    setTaskName('');
   };
 
   return (
     <div>
       <h3>Add New Task</h3>
       <form onSubmit={handleSubmit}>
-        <input 
-          type="text" 
-          value={taskName} 
-          onChange={(e) => setTaskName(e.target.value)} 
-          placeholder="Enter task name" 
+        <TextField
+          label="Task Name"
+          value={taskName}
+          onChange={(e) => setTaskName(e.target.value)}
+          fullWidth
+          variant="outlined"
+          margin="normal"
         />
-        <button type="submit">Add Task</button>
+        <Button type="submit" variant="contained" color="primary">Add Task</Button>
       </form>
     </div>
   );
